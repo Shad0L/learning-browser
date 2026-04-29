@@ -34,6 +34,15 @@
 - **Linux**: 下载 `.AppImage` 直接运行。如果你使用 Arch Linux，也可以下载 `.tar.gz` 源码包自行解压或者通过编写 `PKGBUILD` / `AUR` 进行安装。
 - **macOS**: 下载 `.dmg` 文件并安装。
 
+> **⚠️ macOS 用户注意**: 由于本应用未经过 Apple 开发者认证，安装后运行可能会提示 “已损坏无法打开” 或 “无法验证开发者”。
+> **修复方法**:
+> 1. 打开终端 (Terminal)。
+> 2. 输入以下命令并回车（请确保应用已移动到 “应用程序” 文件夹）：
+>    ```bash
+>    sudo xattr -rd com.apple.quarantine /Applications/learning-browser.app
+>    ```
+> 3. 再次尝试打开即可。
+
 ### 方式二：通过源码自行构建
 
 如果你需要自行修改代码或构建，请确保已安装 [Node.js](https://nodejs.org/) 和 [pnpm](https://pnpm.io/)。

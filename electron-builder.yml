@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.shadol.learning-browser
 productName: learning-browser
 compression: maximum
 directories:
@@ -20,18 +20,21 @@ nsis:
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
-  identity: null
+  category: public.app-category.education
+  identity: "-"
   target:
     - dmg
-    - zip
   extendInfo:
     - NSCameraUsageDescription: Application requests access to the device's camera.
     - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
+  hardenedRuntime: false
+  gatekeeperAssess: false
 dmg:
   artifactName: ${name}-${version}.${ext}
+  internetEnabled: true
 linux:
   target:
     - AppImage
