@@ -31,7 +31,7 @@
 
 你可以直接前往 [GitHub Releases](https://github.com/Shad0L/learning-browser/releases) 页面，下载对应操作系统的最新安装包：
 - **Windows**: 下载 `.exe` 文件并运行。
-- **Linux**: 下载 `.AppImage` 直接运行，或下载 `.deb` 包进行安装。
+- **Linux**: 下载 `.AppImage` 直接运行。如果你使用 Arch Linux，也可以下载 `.tar.gz` 源码包自行解压或者通过编写 `PKGBUILD` / `AUR` 进行安装。
 - **macOS**: 下载 `.dmg` 文件并安装。
 
 ### 方式二：通过源码自行构建

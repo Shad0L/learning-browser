@@ -37,26 +37,46 @@ jobs:
         if: matrix.os == 'ubuntu-22.04'
         run: sudo apt-get update && sudo apt-get install -y libarchive-tools fakeroot libfuse2 squashfs-tools
 
-      - name: Build and Release (Windows)
+      - name: Build (Windows)
         if: matrix.os == 'windows-latest'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pnpm run build
-          pnpm exec electron-builder --win --publish always
+          pnpm exec electron-builder --win
 
-      - name: Build and Release (macOS)
+      - name: Upload Windows Release
+        if: matrix.os == 'windows-latest'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build (macOS)
         if: matrix.os == 'macos-latest'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pnpm run build
-          pnpm exec electron-builder --mac --publish always
+          pnpm exec electron-builder --mac
 
-      - name: Build and Release (Linux)
-        if: matrix.os == 'ubuntu-22.04'
+      - name: Upload macOS Release
+        if: matrix.os == 'macos-latest'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.dmg
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build (Linux)
+        if: matrix.os == 'ubuntu-22.04'
         run: |
           pnpm run build
-          pnpm exec electron-builder --linux --publish always
+          pnpm exec electron-builder --linux
+
+      - name: Upload Linux Release
+        if: matrix.os == 'ubuntu-22.04'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.AppImage
+            dist/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
