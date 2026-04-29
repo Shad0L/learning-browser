@@ -25,34 +25,30 @@
 
 ## 📦 安装指南
 
-本项目目前需要通过源码自行构建安装包。请确保你的电脑上已经安装了 [Node.js](https://nodejs.org/) 和 [pnpm](https://pnpm.io/)。
+### 方式一：直接下载 (推荐)
 
-### 1. 下载并安装依赖
+你可以直接前往 [GitHub Releases](https://github.com/Shad0L/learning-browser/releases) 页面，下载对应操作系统的最新安装包：
+- **Windows**: 下载 `.exe` 文件并运行。
+- **Linux**: 下载 `.AppImage` 直接运行，或下载 `.deb` 包进行安装。
 
-在项目根目录下运行以下命令安装所需的构建依赖：
+### 方式二：通过源码自行构建
 
-```bash
-$ pnpm install
-```
+如果你需要自行修改代码或构建，请确保已安装 [Node.js](https://nodejs.org/) 和 [pnpm](https://pnpm.io/)。
 
-### 2. 构建安装包
+1. **安装依赖**:
+   ```bash
+   $ pnpm install
+   ```
 
-运行对应的命令，将生成适合你操作系统的安装程序：
+2. **构建安装包**:
+   ```bash
+   # Windows
+   $ pnpm build:win
+   # Linux
+   $ pnpm build:linux
+   # macOS
+   $ pnpm build:mac
+   ```
 
-```bash
-# Windows
-$ pnpm build:win
-
-# macOS
-$ pnpm build:mac
-
-# Linux (AppImage / snap / deb)
-$ pnpm build:linux
-```
-
-### 3. 安装应用
-
-打包完成后，打开项目中的 `dist/` 目录：
-- **Windows**: 双击运行 `.exe` 安装程序进行安装。
-- **macOS**: 打开生成的 `.dmg` 文件，将应用拖入“应用程序”文件夹。
-- **Linux**: 直接运行 `.AppImage` 文件，或者安装 `.deb` / `.snap` 包。
+3. **找到安装程序**:
+   构建完成后，在 `dist/` 目录下即可找到对应的安装文件。
