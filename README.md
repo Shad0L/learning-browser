@@ -2,6 +2,8 @@
 
 一款基于 [Electron](https://www.electronjs.org/) + [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) 构建的跨平台轻量级专注学习浏览器。它不仅提供了完整的网页浏览体验，还内置了番茄钟、过滤名单、待办事项、笔记等多种提升学习效率的核心工具。
 
+> **Note**: 本项目完全由 **Vibe Coding** (AI 驱动开发) 模式完成。从功能构思、架构设计、前端实现到自动化构建流程，均由开发者与 AI 协作达成。
+
 ## ✨ 核心特性
 
 - 🚀 **基础浏览器功能**：支持多标签页、前进/后退、页面刷新、快捷键、历史记录。
