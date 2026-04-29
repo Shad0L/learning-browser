@@ -21,7 +21,7 @@ nsis:
   createDesktopShortcut: always
 mac:
   category: public.app-category.education
-  identity: "-"
+  identity: '-'
   target:
     - dmg
   extendInfo:

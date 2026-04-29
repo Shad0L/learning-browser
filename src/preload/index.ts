@@ -1,8 +1,14 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  showContextMenu: (params?: any) => ipcRenderer.send('show-context-menu', params),
+  onContextMenuAction: (callback: (action: string, params: any) => void) => {
+    ipcRenderer.on('context-menu-action', (_event, data) => callback(data.action, data.params))
+  },
+  saveMarkdownClip: (markdown: string) => ipcRenderer.invoke('save-markdown-clip', markdown)
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

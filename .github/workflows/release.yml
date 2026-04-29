@@ -10,7 +10,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ${{ matrix.os }}
-    
+
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-22.04]

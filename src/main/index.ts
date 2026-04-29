@@ -1,5 +1,6 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Menu, session } from 'electron'
 import { join } from 'path'
+import * as fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
@@ -52,6 +53,79 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+  ipcMain.on('show-context-menu', (event, params) => {
+    const template = [
+      { role: 'copy', label: 'Copy' },
+      { role: 'paste', label: 'Paste' },
+      { type: 'separator' },
+      {
+        label: 'Open in New Tab',
+        click: () => {
+          event.sender.send('context-menu-action', { action: 'open-in-new-tab', params })
+        }
+      },
+      {
+        label: 'Save Image',
+        click: () => {
+          event.sender.send('context-menu-action', { action: 'save-image', params })
+        }
+      }
+    ]
+    const menu = Menu.buildFromTemplate(template as any)
+    menu.popup({ window: BrowserWindow.fromWebContents(event.sender) || undefined })
+  })
+
+  let isAdblockerEnabled = false
+  const AD_DOMAINS = [
+    '*://*.doubleclick.net/*',
+    '*://*.google-analytics.com/*',
+    '*://*.googlesyndication.com/*',
+    '*://*.facebook.com/tr*',
+    '*://*.adnxs.com/*',
+    '*://*.adsrvr.org/*',
+    '*://*.scorecardresearch.com/*',
+    '*://*.zedo.com/*',
+    '*://*.adbrite.com/*',
+    '*://*.bns.net/*',
+    '*://*.exponential.com/*',
+    '*://*.quantserve.com/*',
+    '*://*.criteo.com/*',
+    '*://*.taboola.com/*',
+    '*://*.outbrain.com/*'
+  ]
+
+  ipcMain.on('toggle-adblocker', (_, enabled: boolean) => {
+    isAdblockerEnabled = enabled
+  })
+
+  ipcMain.handle('get-adblocker-status', () => {
+    return isAdblockerEnabled
+  })
+
+  session.defaultSession.webRequest.onBeforeRequest(
+    { urls: AD_DOMAINS },
+    (_details, callback) => {
+      if (isAdblockerEnabled) {
+        callback({ cancel: true })
+      } else {
+        callback({ cancel: false })
+      }
+    }
+  )
+
+  // Phase 2.3 Web Clipper IPC fallback: save markdown clip to local filesystem when available
+  ipcMain.handle('save-markdown-clip', async (_event, markdown) => {
+    try {
+      const dir = join(app.getPath('userData'), 'clips')
+      await fs.promises.mkdir(dir, { recursive: true })
+      const file = join(dir, `clip-${Date.now()}.md`)
+      await fs.promises.writeFile(file, markdown, 'utf8')
+      return { ok: true, path: file }
+    } catch (err) {
+      return { ok: false, error: (err as Error)?.message ?? 'unknown' }
+    }
+  })
 
   createWindow()
 

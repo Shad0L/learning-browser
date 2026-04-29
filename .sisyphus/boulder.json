@@ -1,0 +1,17 @@
+{
+  "active_plan": "/home/shadol/learning-browser/.sisyphus/plans/comprehensive-upgrade.md",
+  "started_at": "2026-04-29T14:25:22.755Z",
+  "session_ids": [
+    "ses_2267b7d08ffee3hW0yL0d34mUq",
+    "ses_225f19c34ffeUhSKWEwJK8oj4l",
+    "ses_225e7eef1ffeHBhgXiy5F33OC7"
+  ],
+  "session_origins": {
+    "ses_2267b7d08ffee3hW0yL0d34mUq": "direct",
+    "ses_225f19c34ffeUhSKWEwJK8oj4l": "appended",
+    "ses_225e7eef1ffeHBhgXiy5F33OC7": "appended"
+  },
+  "plan_name": "comprehensive-upgrade",
+  "agent": "atlas",
+  "task_sessions": {}
+}
