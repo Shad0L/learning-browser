@@ -13,7 +13,7 @@ jobs:
     
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [windows-latest, macos-latest, ubuntu-22.04]
 
     steps:
       - name: Check out git repository
@@ -34,7 +34,7 @@ jobs:
         run: pnpm install
 
       - name: Install Linux dependencies
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-22.04'
         run: sudo apt-get update && sudo apt-get install -y libarchive-tools fakeroot libfuse2 squashfs-tools
 
       - name: Build and Release (Windows)
@@ -54,7 +54,7 @@ jobs:
           pnpm exec electron-builder --mac --publish always
 
       - name: Build and Release (Linux)
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-22.04'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
