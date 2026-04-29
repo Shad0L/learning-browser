@@ -39,8 +39,6 @@ jobs:
 
       - name: Build (Windows)
         if: matrix.os == 'windows-latest'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pnpm run build
           pnpm exec electron-builder --win
@@ -55,8 +53,6 @@ jobs:
 
       - name: Build (macOS)
         if: matrix.os == 'macos-latest'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pnpm run build
           pnpm exec electron-builder --mac
@@ -73,7 +69,6 @@ jobs:
         if: matrix.os == 'ubuntu-22.04'
         env:
           APPIMAGE_EXTRACT_AND_RUN: 1
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pnpm run build
           pnpm exec electron-builder --linux
