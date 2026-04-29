@@ -7,8 +7,10 @@ on:
 
 jobs:
   release:
+    permissions:
+      contents: write
     runs-on: ${{ matrix.os }}
-
+    
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
@@ -31,13 +33,30 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build/Release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: true
-          # For macOS, we provide a dummy cert or skip signing if not configured
-          # For Linux, it will build deb, snap, AppImage as defined in config
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y libarchive-tools fakeroot bsdtar
+
+      - name: Build and Release (Windows)
+        if: matrix.os == 'windows-latest'
         env:
-          # You can add APPLE_ID, APPLE_PASSWORD etc. here later for macOS notarization
-          MAX_ATTEMPTS: 3
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pnpm run build
+          pnpm exec electron-builder --win --publish always
+
+      - name: Build and Release (macOS)
+        if: matrix.os == 'macos-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pnpm run build
+          pnpm exec electron-builder --mac --publish always
+
+      - name: Build and Release (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pnpm run build
+          pnpm exec electron-builder --linux --publish always

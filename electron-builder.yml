@@ -21,6 +21,7 @@ nsis:
   createDesktopShortcut: always
 mac:
   target:
+    - dmg
     - zip
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -45,5 +46,6 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
+  owner: Shad0L
+  repo: learning-browser
