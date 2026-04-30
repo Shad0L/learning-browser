@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useAppStore } from '../../store'
-import { Star, ListTodo, History as HistoryIcon, BarChart2, X, CheckCircle } from 'lucide-react'
+import { FileText, Bookmark, ListTodo, History as HistoryIcon, BarChart2, X, CheckCircle, Scissors } from 'lucide-react'
 import { PomodoroStats } from '../stats/PomodoroStats'
 
-export const Sidebar: React.FC = () => {
+const Sidebar: React.FC = () => {
   const {
     showSidebar,
     setShowSidebar,
@@ -23,25 +23,6 @@ export const Sidebar: React.FC = () => {
     createTab
   } = useAppStore()
 
-  const [MarkdownComp, setMarkdownComp] = useState<any>(null)
-  const [mdReady, setMdReady] = useState<boolean>(false)
-
-  useEffect(() => {
-    let alive = true
-    // @ts-ignore: react-markdown might not be installed in all environments
-    import('react-markdown').then((mod) => {
-      if (!alive) return
-      const Comp = (mod as any).default ?? mod
-      setMarkdownComp(() => Comp)
-      setMdReady(true)
-    }).catch(() => {
-      setMdReady(false)
-    })
-    return () => {
-      alive = false
-    }
-  }, [])
-
   if (!showSidebar) return null
 
   return (
@@ -53,14 +34,14 @@ export const Sidebar: React.FC = () => {
             onClick={() => setSidebarTab('NOTES')}
             title="笔记"
           >
-            <Star size={14} />
+            <FileText size={14} />
           </button>
           <button
             className={`nav-button ${sidebarTab === 'BOOKMARKS' ? 'active' : ''}`}
             onClick={() => setSidebarTab('BOOKMARKS')}
             title="书签"
           >
-            <Star size={14} />
+            <Bookmark size={14} />
           </button>
           <button
             className={`nav-button ${sidebarTab === 'TODOS' ? 'active' : ''}`}
@@ -93,51 +74,51 @@ export const Sidebar: React.FC = () => {
       >
         {sidebarTab === 'NOTES' && (
           <div className="notes-section" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-            {mdReady ? (
-              <div style={{ display: 'flex', gap: '8px', height: '100%' }}>
-                <textarea
-                  className="notes-area"
-                  style={{ flex: 1, resize: 'none' }}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="随手记..."
-                />
-                <div style={{ width: '50%', borderLeft: '1px solid #e5e7eb', paddingLeft: '8px', overflowY: 'auto' }}>
-                  {MarkdownComp && <MarkdownComp>{notes}</MarkdownComp>}
-                </div>
-              </div>
-            ) : (
-              <textarea
-                className="notes-area"
-                style={{ flex: 1, resize: 'none' }}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="随手记..."
-              />
-            )}
-            <div style={{ marginTop: '6px', display: 'flex', gap: '6px' }}>
-              <button
-                className="overlay-button"
-                onClick={() => {
-                  const sel =
-                    typeof window !== 'undefined' && window.getSelection()
-                      ? window.getSelection()?.toString()
-                      : ''
-                  if (sel) {
-                    setNotes(notes + (notes ? '\n' : '') + sel)
-                    try {
-                      const existing = JSON.parse(localStorage.getItem('clips') || '[]')
-                      const clip = { text: sel, url: activeTab?.url ?? '', ts: Date.now() }
-                      existing.push(clip)
-                      localStorage.setItem('clips', JSON.stringify(existing))
-                    } catch {
-                    }
+            <textarea
+              className="notes-area"
+              style={{ flex: 1, resize: 'none' }}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="随手记..."
+            />
+            <button
+              style={{
+                marginTop: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '8px 0',
+                width: '100%',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-app)',
+                color: 'var(--text-secondary)',
+                fontSize: '12px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all var(--transition)'
+              }}
+              onClick={() => {
+                const sel =
+                  typeof window !== 'undefined' && window.getSelection()
+                    ? window.getSelection()?.toString()
+                    : ''
+                if (sel) {
+                  setNotes(notes + (notes ? '\n' : '') + sel)
+                  try {
+                    const existing = JSON.parse(localStorage.getItem('clips') || '[]')
+                    const clip = { text: sel, url: activeTab?.url ?? '', ts: Date.now() }
+                    existing.push(clip)
+                    localStorage.setItem('clips', JSON.stringify(existing))
+                  } catch {
                   }
-                }}
-              >
-                Clip Page
-              </button>
-            </div>
+                }
+              }}
+            >
+              <Scissors size={12} />
+              Clip Page
+            </button>
           </div>
         )}
         {sidebarTab === 'BOOKMARKS' && (
@@ -157,8 +138,8 @@ export const Sidebar: React.FC = () => {
             {bookmarks.length === 0 && (
               <div
                 style={{
-                  padding: '10px',
-                  color: '#9ca3af',
+                  padding: '24px 10px',
+                  color: 'var(--text-muted)',
                   textAlign: 'center',
                   fontSize: '12px'
                 }}
@@ -223,15 +204,19 @@ export const Sidebar: React.FC = () => {
         )}
         {sidebarTab === 'HISTORY' && (
           <div className="history-section" style={{ overflowY: 'auto', flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingBottom: '5px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingBottom: '4px' }}>
               <button
                 onClick={() => setHistory([])}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#ef4444',
+                  color: 'var(--text-muted)',
                   cursor: 'pointer',
-                  fontSize: '12px'
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  padding: '4px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  transition: 'all var(--transition)'
                 }}
               >
                 清除记录
@@ -251,3 +236,5 @@ export const Sidebar: React.FC = () => {
     </aside>
   )
 }
+
+export default Sidebar

@@ -1,8 +1,20 @@
-import { app, shell, BrowserWindow, ipcMain, Menu, session } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import * as fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+
+if (process.platform === 'linux') {
+  app.disableHardwareAcceleration()
+  app.commandLine.appendSwitch('disable-gpu')
+  app.commandLine.appendSwitch('disable-dev-shm-usage')
+  app.commandLine.appendSwitch('disable-gpu-sandbox')
+  app.commandLine.appendSwitch('disable-setuid-sandbox')
+  app.commandLine.appendSwitch('no-zygote')
+  app.commandLine.appendSwitch('disable-seccomp-filter-sandbox')
+  app.commandLine.appendSwitch('in-process-gpu')
+  app.commandLine.appendSwitch('disable-features', 'NetworkService')
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -37,9 +49,6 @@ function createWindow(): void {
   }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.shadol.learning-browser')
@@ -77,24 +86,6 @@ app.whenReady().then(() => {
   })
 
   let isAdblockerEnabled = false
-  const AD_DOMAINS = [
-    '*://*.doubleclick.net/*',
-    '*://*.google-analytics.com/*',
-    '*://*.googlesyndication.com/*',
-    '*://*.facebook.com/tr*',
-    '*://*.adnxs.com/*',
-    '*://*.adsrvr.org/*',
-    '*://*.scorecardresearch.com/*',
-    '*://*.zedo.com/*',
-    '*://*.adbrite.com/*',
-    '*://*.bns.net/*',
-    '*://*.exponential.com/*',
-    '*://*.quantserve.com/*',
-    '*://*.criteo.com/*',
-    '*://*.taboola.com/*',
-    '*://*.outbrain.com/*'
-  ]
-
   ipcMain.on('toggle-adblocker', (_, enabled: boolean) => {
     isAdblockerEnabled = enabled
   })
@@ -102,17 +93,6 @@ app.whenReady().then(() => {
   ipcMain.handle('get-adblocker-status', () => {
     return isAdblockerEnabled
   })
-
-  session.defaultSession.webRequest.onBeforeRequest(
-    { urls: AD_DOMAINS },
-    (_details, callback) => {
-      if (isAdblockerEnabled) {
-        callback({ cancel: true })
-      } else {
-        callback({ cancel: false })
-      }
-    }
-  )
 
   // Phase 2.3 Web Clipper IPC fallback: save markdown clip to local filesystem when available
   ipcMain.handle('save-markdown-clip', async (_event, markdown) => {

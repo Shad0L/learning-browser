@@ -72,6 +72,16 @@ interface AppState {
   setWhiteNoiseEnabled: React.Dispatch<React.SetStateAction<boolean>>
   whiteNoiseVolume: number
   setWhiteNoiseVolume: React.Dispatch<React.SetStateAction<number>>
+  noiseType: 'brown' | 'rain' | 'ocean'
+  setNoiseType: React.Dispatch<React.SetStateAction<'brown' | 'rain' | 'ocean'>>
+
+  readerMode: boolean
+  setReaderMode: React.Dispatch<React.SetStateAction<boolean>>
+  readerText: string
+  setReaderText: React.Dispatch<React.SetStateAction<string>>
+
+  offlineResults: Array<{ title: string; url: string; snippet: string }>
+  setOfflineResults: React.Dispatch<React.SetStateAction<Array<{ title: string; url: string; snippet: string }>>>
 
   workMinutes: number
   setWorkMinutes: React.Dispatch<React.SetStateAction<number>>
@@ -111,6 +121,7 @@ interface AppState {
   closeTab: (e: React.MouseEvent, id: string) => void
   switchTab: (id: string) => void
   handleZoom: (direction: 'in' | 'out' | 'reset') => void
+  performOfflineSearch: (query: string) => void
 }
 
 const AppContext = createContext<AppState | undefined>(undefined)
@@ -119,15 +130,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [tabs, setTabs] = useState<Tab[]>([
     {
       id: '1',
-      url: 'https://www.google.com',
-      title: 'Google',
+      url: 'about:blank',
+      title: 'New Tab',
       canGoBack: false,
       canGoForward: false,
       isLoading: false
     }
   ])
   const [activeTabId, setActiveTabId] = useState<string>('1')
-  const [inputUrl, setInputUrl] = useState('https://www.google.com')
+  const [inputUrl, setInputUrl] = useState('')
 
   const [showSidebar, setShowSidebar] = useState(false)
   const [sidebarTab, setSidebarTab] = useState<'NOTES' | 'BOOKMARKS' | 'TODOS' | 'HISTORY' | 'STATS'>('NOTES')
@@ -187,6 +198,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const stored = localStorage.getItem('whiteNoiseVolume')
     return stored ? parseFloat(stored) : 0.5
   })
+  const [noiseType, setNoiseType] = useState<'brown' | 'rain' | 'ocean'>(() => {
+    return (localStorage.getItem('noiseType') as 'brown' | 'rain' | 'ocean') || 'ocean'
+  })
+
+  const [readerMode, setReaderMode] = useState(false)
+  const [readerText, setReaderText] = useState('')
+  const [offlineResults, setOfflineResults] = useState<Array<{ title: string; url: string; snippet: string }>>([])
 
   const [workMinutes, setWorkMinutes] = useState(25)
   const [breakMinutes, setBreakMinutes] = useState(5)
@@ -233,6 +251,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     localStorage.setItem('whiteNoiseVolume', whiteNoiseVolume.toString())
   }, [whiteNoiseVolume])
+  useEffect(() => {
+    localStorage.setItem('noiseType', noiseType)
+  }, [noiseType])
 
   useEffect(() => {
     localStorage.setItem('isAdblockerEnabled', isAdblockerEnabled.toString())
@@ -268,6 +289,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, [timeLeft, status, workMinutes, addSession])
 
+  const offlineSearchData = [
+    { title: 'Learning Browser Intro', url: 'https://example.org/intro', snippet: 'Overview of features and offline fallback.' },
+    { title: 'Pomodoro Tips', url: 'https://example.org/pomodoro', snippet: 'Maximize focus with short cycles.' },
+    { title: 'Local Fallbacks', url: 'https://example.org/fallbacks', snippet: 'Offline-first strategies for resilience.' },
+    { title: 'Filter Modes', url: 'https://example.org/filters', snippet: 'How to use blacklist/whitelist effectively.' }
+  ]
+
+  const performOfflineSearch = (query: string) => {
+    const q = query.toLowerCase()
+    const results = offlineSearchData
+      .filter((d) => d.title.toLowerCase().includes(q) || d.snippet.toLowerCase().includes(q))
+      .slice(0, 4)
+    setOfflineResults(results)
+  }
+
   const updateTab = (id: string, updates: Partial<Tab>) => {
     setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)))
   }
@@ -294,7 +330,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     e?.preventDefault()
     let url = inputUrl.trim()
     if (!url.includes('.') && !url.startsWith('http')) {
-      url = `https://www.google.com/search?q=${encodeURIComponent(url)}`
+      url = `https://cn.bing.com/search?q=${encodeURIComponent(url)}`
     } else if (!/^https?:\/\//i.test(url)) {
       url = 'https://' + url
     }
@@ -307,7 +343,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     ])
   }
 
-  const createTab = (url = 'https://www.google.com') => {
+  const createTab = (url = 'about:blank') => {
     const id = Date.now().toString()
     setTabs([
       ...tabs,
@@ -412,6 +448,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setWhiteNoiseEnabled,
     whiteNoiseVolume,
     setWhiteNoiseVolume,
+    noiseType,
+    setNoiseType,
+    readerMode,
+    setReaderMode,
+    readerText,
+    setReaderText,
+    offlineResults,
+    setOfflineResults,
+    performOfflineSearch,
     workMinutes,
     setWorkMinutes,
     breakMinutes,
